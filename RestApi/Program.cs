@@ -31,8 +31,11 @@ namespace RestApi
                 Console.WriteLine($"Preis: {cryptoData.Price} USD");
                 Console.WriteLine($"Marktkapitalisierung: {cryptoData.MarketCap} USD");
                 Console.WriteLine($"Volumen (24h): {cryptoData.Volume_24h} USD");
-                Console.WriteLine($"Zirkulierende Versorgung: {cryptoData.CirculatingSupply}");
                 Console.WriteLine($"Allzeithoch: {cryptoData.AllTimeHigh} USD");
+                Console.WriteLine($"Gesamtversorgung: {cryptoData.TotalSupply}");
+                Console.WriteLine($"Maximale Versorgung: {cryptoData.MaxSupply ?? 0}");
+                Console.WriteLine($"Beta-Wert: {cryptoData.BetaValue}");
+                Console.WriteLine($"Letzte Aktualisierung: {cryptoData.LastUpdated}");
             }
             catch (Exception ex)
             {

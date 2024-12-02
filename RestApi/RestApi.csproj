@@ -17,8 +17,4 @@
     <PackageReference Include="System.Windows.Forms.Ribbon35" Version="3.5.8" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="View\" />
-  </ItemGroup>
-
 </Project>

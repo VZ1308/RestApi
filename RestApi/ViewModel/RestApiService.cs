@@ -7,36 +7,50 @@ namespace RestApi.ViewModel
 {
     public interface IRestApi
     {
-        Task<HttpResponseMessage> GetAsync(string cryptoId); // holt die Daten einer Kryptowährung anhand der ID
-        Task<string> GetCryptoIdAsync(string query); // findet die ID zu einem Namen
+        Task<HttpResponseMessage> GetAsync(string cryptoId); // Holt die Daten einer Kryptowährung anhand der ID
+        Task<string> GetCryptoIdAsync(string query); // Findet die ID zu einem Namen
     }
 
     public class RestApiService : IRestApi
     {
-        private const string BASICENDPOINT = "https://api.coinpaprika.com/v1/";
+        // Entferne den Zeilenumbruch \r\n, damit die URL korrekt ist
+        private const string BASICENDPOINT = "https://api.coinpaprika.com/v1";
         private readonly ILogService _logService;
 
+        public RestApiService(ILogService logService)
+        {
+            _logService = logService ?? throw new ArgumentNullException(nameof(logService));
+        }
+
+        /// <summary>
+        /// Findet die ID zum eingegebenen Namen und wird dann weiterverarbeitet.
+        /// </summary>
+        /// <param name="query">Der Suchbegriff, z.B. der Name einer Kryptowährung.</param>
+        /// <returns>Die ID der Kryptowährung als Zeichenfolge.</returns>
+        /// <exception cref="Exception">Wird ausgelöst, wenn keine Kryptowährung gefunden wird oder ein Fehler auftritt.</exception>
         public async Task<string> GetCryptoIdAsync(string query)
         {
             try
             {
-                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) }; // setzt ein Timeout von 30 Sekunden, nach dem die Anfrage abgebrochen wird, falls keine Antwort kommt
-                var searchUrl = $"{BASICENDPOINT}search?q={query}&c=currencies"; // query enthält den eingegebenen Suchbegriff
+                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+                var searchUrl = $"{BASICENDPOINT}/search?q={query}&c=currencies"; // URL korrekt zusammensetzen
                 Console.WriteLine($"Suche nach Kryptowährungs-ID unter: {searchUrl}");
-                var response = await client.GetAsync(searchUrl); // speichert das Ergebnis der Anfrage als HttpResponseMessage
+                var response = await client.GetAsync(searchUrl);
 
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
 
-                // dynamic wenn der Typ zur Laufzeit entschieden wird
-                dynamic jsonResponse = JsonConvert.DeserializeObject(content); // wird verwendet, um einen JSON-String (content) in ein C#-Objekt umzuwandeln
+                // Deserialisierung des JSON-Strings in ein dynamisches Objekt
+                dynamic jsonResponse = JsonConvert.DeserializeObject(content);
 
-                if (jsonResponse.currencies.Count == 0)
+                // Prüfe, ob "currencies" vorhanden ist und nicht leer
+                if (jsonResponse?.currencies == null || jsonResponse.currencies.Count == 0)
                 {
                     throw new Exception("Keine passende Kryptowährung gefunden.");
                 }
 
-                return jsonResponse.currencies[0].id; // greift auf erstes Element in der Liste zu 
+                // Rückgabe der ID der ersten gefundenen Währung
+                return jsonResponse.currencies[0].id;
             }
             catch (Exception ex)
             {
@@ -45,12 +59,19 @@ namespace RestApi.ViewModel
             }
         }
 
+        /// <summary>
+        /// Führt eine GET-Anfrage an die API durch, um die vollständigen Daten einer Kryptowährung zu erhalten.
+        /// </summary>
+        /// <param name="endpoint">Die API-Endpunkt-ID der Kryptowährung, z.B. "btc-bitcoin".</param>
+        /// <returns>Die HTTP-Antwort mit den angeforderten Kryptowährungsdaten.</returns>
+        /// <exception cref="HttpRequestException">Wird ausgelöst, wenn ein HTTP-Fehler auftritt.</exception>
+        /// <exception cref="Exception">Wird ausgelöst, wenn ein allgemeiner Fehler auftritt.</exception>
         public async Task<HttpResponseMessage> GetAsync(string endpoint)
         {
             try
             {
                 using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-                var url = $"{BASICENDPOINT}tickers/{endpoint}";
+                var url = $"{BASICENDPOINT}/tickers/{endpoint}"; // URL korrekt zusammensetzen
                 Console.WriteLine($"Anfrage an URL: {url}");
                 var response = await client.GetAsync(url);
 

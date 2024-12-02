@@ -3,24 +3,14 @@ using System.Collections.Generic;
 
 namespace RestApi.Model.CryptoData
 {
-    public class Quote
-    {
-        [JsonProperty("price")]
-        public decimal Price { get; set; }
-
-        [JsonProperty("market_cap")]
-        public decimal MarketCap { get; set; }
-
-        [JsonProperty("volume_24h")]
-        public decimal Volume_24h { get; set; }
-
-        [JsonProperty("ath_price")]
-        public decimal AllTimeHigh { get; set; }
-    }
-
+    /// <summary>
+    /// Diese Klasse repräsentiert alle Informationen über eine Kryptowährung.
+    /// </summary>
     public class CryptoData
     {
-        public string id { get; set; }
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
         [JsonProperty("name")]
         public string Name { get; set; }
 
@@ -33,14 +23,19 @@ namespace RestApi.Model.CryptoData
         [JsonProperty("total_supply")]
         public decimal TotalSupply { get; set; }
 
-        [JsonProperty("circulating_supply")]
-        public decimal CirculatingSupply { get; set; }
+        [JsonProperty("max_supply")]
+        public decimal? MaxSupply { get; set; }
 
+        [JsonProperty("beta_value")]
+        public decimal BetaValue { get; set; }
 
         [JsonProperty("quotes")]
         public Dictionary<string, Quote> Quotes { get; set; }
 
-        // Werte für die Darstellung in der Konsole
+        [JsonProperty("last_updated")]
+        public string LastUpdated { get; set; }
+
+        // Zusätzliche Eigenschaften für die Konsolenausgabe
         public decimal Price { get; set; }
         public decimal MarketCap { get; set; }
         public decimal Volume_24h { get; set; }
